@@ -1,43 +1,4 @@
-<script type="text/javascript">
-        var gk_isXlsx = false;
-        var gk_xlsxFileLookup = {};
-        var gk_fileData = {};
-        function filledCell(cell) {
-          return cell !== '' && cell != null;
-        }
-        function loadFileData(filename) {
-        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
-            try {
-                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
-                var firstSheetName = workbook.SheetNames[0];
-                var worksheet = workbook.Sheets[firstSheetName];
-
-                // Convert sheet to JSON to filter blank rows
-                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
-                // Filter out blank rows (rows where all cells are empty, null, or undefined)
-                var filteredData = jsonData.filter(row => row.some(filledCell));
-
-                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
-                var headerRowIndex = filteredData.findIndex((row, index) =>
-                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
-                );
-                // Fallback
-                if (headerRowIndex === -1 || headerRowIndex > 25) {
-                  headerRowIndex = 0;
-                }
-
-                // Convert filtered JSON back to CSV
-                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
-                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
-                return csv;
-            } catch (e) {
-                console.error(e);
-                return "";
-            }
-        }
-        return gk_fileData[filename] || "";
-        }
-        </script><!doctype html>
+<!doctype html>
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
@@ -67,6 +28,17 @@
               700: "#d4d4d4",
               800: "#f5f5f5",
               900: "#ffffff"
+            },
+            light: {
+              100: "#ffffff",
+              200: "#f5f5f5",
+              300: "#e5e5e5",
+              400: "#d4d4d4",
+              500: "#a3a3a3",
+              600: "#737373",
+              700: "#525252",
+              800: "#404040",
+              900: "#2d2d2d"
             }
           }
         }
@@ -77,8 +49,14 @@
     body {
       font-family: Tajawal, sans-serif;
       direction: rtl;
+    }
+    [data-theme="dark"] {
       background-color: #000;
       color: #fff;
+    }
+    [data-theme="light"] {
+      background-color: #ffffff;
+      color: #000;
     }
     @keyframes ripple {
       0% { transform: scale(0); opacity: .5; }
@@ -108,8 +86,13 @@
     }
     .progress-circle-bg {
       fill: none;
-      stroke: #ffffff; /* تغيير اللون إلى الأبيض */
       stroke-width: 8;
+    }
+    [data-theme="dark"] .progress-circle-bg {
+      stroke: #ffffff;
+    }
+    [data-theme="light"] .progress-circle-bg {
+      stroke: #000000;
     }
     .progress-circle-fill {
       fill: none;
@@ -118,12 +101,19 @@
       stroke-linecap: round;
       transition: stroke-dashoffset .3s ease;
     }
-    .card {
+    [data-theme="dark"] .card {
       background-color: #1a1a1a;
       border: 1px solid #2d2d2d;
     }
-    .progress-bar {
+    [data-theme="light"] .card {
+      background-color: #ffffff;
+      border: 1px solid #d4d4d4;
+    }
+    [data-theme="dark"] .progress-bar {
       background-color: #2d2d2d;
+    }
+    [data-theme="light"] .progress-bar {
+      background-color: #e5e5e5;
     }
     .progress-fill {
       background-color: #9333ea;
@@ -140,58 +130,62 @@
       justify-content: center;
       z-index: 50;
     }
-    .modal-content {
+    [data-theme="dark"] .modal-content {
       background: #1a1a1a;
+      border: 1px solid #2d2d2d;
+    }
+    [data-theme="light"] .modal-content {
+      background: #ffffff;
+      border: 1px solid #d4d4d4;
+    }
+    .modal-content {
       padding: 20px;
       border-radius: 8px;
-      border: 1px solid #2d2d2d;
       width: 90%;
       max-width: 400px;
       text-align: center;
     }
+    [data-theme="dark"] .zikr-count {
+      color: #a3a3a3; /* text-dark-600 */
+    }
+    [data-theme="light"] .zikr-count {
+      color: #737373; /* text-light-600 */
+    }
   </style>
 </head>
-<body>
+<body data-theme="dark">
   <div id="root"></div>
   <script type="text/javascript">
-        var gk_isXlsx = false;
-        var gk_xlsxFileLookup = {};
-        var gk_fileData = {};
-        function filledCell(cell) {
-          return cell !== '' && cell != null;
+    var gk_isXlsx = false;
+    var gk_xlsxFileLookup = {};
+    var gk_fileData = {};
+    function filledCell(cell) {
+      return cell !== '' && cell != null;
+    }
+    function loadFileData(filename) {
+      if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+        try {
+          var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+          var firstSheetName = workbook.SheetNames[0];
+          var worksheet = workbook.Sheets[firstSheetName];
+          var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+          var filteredData = jsonData.filter(row => row.some(filledCell));
+          var headerRowIndex = filteredData.findIndex((row, index) =>
+            row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+          );
+          if (headerRowIndex === -1 || headerRowIndex > 25) {
+            headerRowIndex = 0;
+          }
+          var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex));
+          csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+          return csv;
+        } catch (e) {
+          console.error(e);
+          return "";
         }
-        function loadFileData(filename) {
-        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
-            try {
-                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
-                var firstSheetName = workbook.SheetNames[0];
-                var worksheet = workbook.Sheets[firstSheetName];
-
-                // Convert sheet to JSON to filter blank rows
-                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
-                // Filter out blank rows (rows where all cells are empty, null, or undefined)
-                var filteredData = jsonData.filter(row => row.some(filledCell));
-
-                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
-                var headerRowIndex = filteredData.findIndex((row, index) =>
-                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
-                );
-                // Fallback
-                if (headerRowIndex === -1 || headerRowIndex > 25) {
-                  headerRowIndex = 0;
-                }
-
-                // Convert filtered JSON back to CSV
-                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
-                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
-                return csv;
-            } catch (e) {
-                console.error(e);
-                return "";
-            }
-        }
-        return gk_fileData[filename] || "";
-        }
+      }
+      return gk_fileData[filename] || "";
+    }
   </script>
   <script type="text/babel">
     function Modal({ isOpen, onClose, onSubmit, title, defaultValue = '', type = 'text', isConfirm = false }) {
@@ -244,12 +238,12 @@
                   setInputValue(e.target.value);
                   console.log('Modal: Input changed to:', e.target.value);
                 }}
-                className="w-full py-2 px-4 bg-dark-100 border border-dark-200 rounded-lg text-white mb-4"
+                className="w-full py-2 px-4 border rounded-lg mb-4 text-[color:--text-color] bg-[color:--input-bg] border-[color:--input-border]"
                 placeholder="أدخل القيمة..."
               />
             )}
             {isConfirm && (
-              <div className="text-white mb-4">
+              <div className="text-[color:--text-color] mb-4">
                 {type === 'about' ? (
                   <>
                     <p>مسبحة الماكن الإلكترونية - الإصدار 1.0.0</p>
@@ -292,7 +286,7 @@
                   console.log('Modal: Cancel button clicked');
                   onClose();
                 }}
-                className="bg-dark-200 text-white px-4 py-2 rounded-lg mx-2"
+                className="bg-[color:--button-bg] text-[color:--text-color] px-4 py-2 rounded-lg mx-2"
               >
                 إلغاء
               </button>
@@ -317,7 +311,8 @@
         ],
         settings: {
           sound: true,
-          vibration: true
+          vibration: true,
+          theme: 'dark' // Set dark theme as default
         },
         stats: {
           daily: 0,
@@ -349,7 +344,6 @@
 
           if (savedState) {
             let parsedState = JSON.parse(savedState);
-            
             if (lastResetDate !== today) {
               console.log('App: New day detected, resetting daily counters');
               parsedState = {
@@ -365,11 +359,12 @@
               localStorage.setItem('tasbihState', JSON.stringify(parsedState));
               console.log('App: Daily counters reset and saved to localStorage');
             }
-            
             setState(parsedState);
             console.log('App: State loaded from localStorage:', parsedState);
           } else {
             localStorage.setItem('lastResetDate', today);
+            localStorage.setItem('tasbihState', JSON.stringify(state));
+            console.log('App: Initial state saved to localStorage:', state);
           }
         } catch (error) {
           console.error('App: Error parsing saved state or resetting counters:', error);
@@ -380,6 +375,7 @@
         try {
           localStorage.setItem('tasbihState', JSON.stringify(state));
           console.log('App: State saved to localStorage:', state);
+          document.body.setAttribute('data-theme', state.settings.theme);
         } catch (error) {
           console.error('App: Error saving state to localStorage:', error);
         }
@@ -776,7 +772,20 @@
       const offset = circumference - (circleProgress / 100) * circumference;
 
       return (
-        <div className="min-h-screen bg-black text-white mx-auto max-w-md">
+        <div className="min-h-screen text-[color:--text-color] mx-auto max-w-md">
+          <style>
+            {`
+              :root {
+                --text-color: ${state.settings.theme === 'dark' ? '#ffffff' : '#000000'};
+                --input-bg: ${state.settings.theme === 'dark' ? '#1a1a1a' : '#ffffff'};
+                --input-border: ${state.settings.theme === 'dark' ? '#2d2d2d' : '#d4d4d4'};
+                --button-bg: ${state.settings.theme === 'dark' ? '#2d2d2d' : '#e5e5e5'};
+                --card-bg: ${state.settings.theme === 'dark' ? '#1a1a1a' : '#ffffff'};
+                --card-border: ${state.settings.theme === 'dark' ? '#2d2d2d' : '#d4d4d4'};
+                --progress-bar-bg: ${state.settings.theme === 'dark' ? '#2d2d2d' : '#e5e5e5'};
+              }
+            `}
+          </style>
           <Modal
             isOpen={modal.isOpen && modal.type === 'editZikrGoal'}
             onClose={closeModal}
@@ -822,7 +831,7 @@
             isConfirm={true}
           />
 
-          <div className="fixed top-0 w-full bg-dark-100 border-b border-dark-200 z-10 max-w-md">
+          <div className="fixed top-0 w-full border-b border-[color:--card-border] z-10 max-w-md bg-[color:--card-bg]">
             <div className="flex items-center justify-center h-14 px-4">
               <h1 className="text-xl font-bold text-primary">مسبحة الماكن الإلكترونية</h1>
             </div>
@@ -832,7 +841,7 @@
             {activeTab === 'tasbih' && (
               <div className="px-4 py-6">
                 <div className="flex flex-col items-center justify-center mt-8">
-                  <h2 className="text-xl font-medium text-white mb-4">{state.currentZikr}</h2>
+                  <h2 className="text-xl font-medium mb-4">{state.currentZikr}</h2>
                   
                   <div className="relative w-72 h-72 flex items-center justify-center">
                     <svg className="progress-circle" width="272" height="272" viewBox="0 0 272 272">
@@ -857,35 +866,35 @@
                       onMouseUp={handleMouseUp}
                       onTouchStart={handleMouseDown}
                       onTouchEnd={handleMouseUp}
-                      className={`circle-button bg-dark-100 border border-dark-200 shadow-lg rounded-full w-64 h-64 flex items-center justify-center cursor-pointer relative overflow-hidden ${isPressed ? 'active' : ''}`}
+                      className={`circle-button bg-[color:--card-bg] border border-[color:--card-border] shadow-lg rounded-full w-64 h-64 flex items-center justify-center cursor-pointer relative overflow-hidden ${isPressed ? 'active' : ''}`}
                     >
                       {isPressed && <div className="ripple-effect"></div>}
                       <div className="text-center">
-                        <h2 className="text-6xl font-bold text-white">{state.count}</h2>
+                        <h2 className="text-6xl font-bold">{state.count}</h2>
                       </div>
                     </div>
                     <button 
                       onClick={resetCounter}
-                      className="absolute top-[280px] right-4 w-12 h-12 rounded-full bg-dark-100 border border-dark-200 shadow-md flex items-center justify-center cursor-pointer transition-transform hover:scale-110"
+                      className="absolute top-[280px] right-4 w-12 h-12 rounded-full bg-[color:--card-bg] border border-[color:--card-border] shadow-md flex items-center justify-center cursor-pointer transition-transform hover:scale-110"
                     >
                       <span className="text-primary text-xl">↺</span>
                     </button>
                     <button 
                       onClick={editCurrentZikrGoal}
-                      className="absolute top-[280px] left-4 w-12 h-12 rounded-full bg-dark-100 border border-dark-200 shadow-md flex items-center justify-center cursor-pointer transition-transform hover:scale-110"
+                      className="absolute top-[280px] left-4 w-12 h-12 rounded-full bg-[color:--card-bg] border border-[color:--card-border] shadow-md flex items-center justify-center cursor-pointer transition-transform hover:scale-110"
                     >
-                      <span className="text-dark-500 text-xl">✎</span>
+                      <span className="text-[color:--text-color] text-xl">✎</span>
                     </button>
                   </div>
 
-                  <div className="mt-24 bg-dark-100 border border-dark-200 rounded-lg shadow-sm p-4 w-full">
+                  <div className="mt-24 bg-[color:--card-bg] border border-[color:--card-border] rounded-lg shadow-sm p-4 w-full">
                     <div className="flex justify-between items-center">
-                      <span className="text-white">الهدف اليومي</span>
-                      <span className="text-white font-medium">
+                      <span>الهدف اليومي</span>
+                      <span className="font-medium">
                         {state.dailyCount} / {state.stats.goals.daily}
                       </span>
                     </div>
-                    <div className="w-full bg-dark-200 rounded-full h-2 mt-2">
+                    <div className="w-full bg-[color:--progress-bar-bg] rounded-full h-2 mt-2">
                       <div 
                         className="bg-primary h-2 rounded-full" 
                         style={{ width: `${dailyProgress}%` }}
@@ -905,10 +914,10 @@
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                       placeholder="ابحث عن ذكر..." 
-                      className="w-full py-3 px-4 bg-dark-100 border border-dark-200 rounded-lg shadow-sm pl-10 text-white placeholder-dark-500"
+                      className="w-full py-3 px-4 bg-[color:--input-bg] border border-[color:--input-border] rounded-lg shadow-sm pl-10 placeholder-[color:--text-color]"
                     />
                     <div className="absolute left-3 top-3 w-6 h-6 flex items-center justify-center">
-                      <span className="text-dark-500">🔍</span>
+                      <span className="text-[color:--text-color]">🔍</span>
                     </div>
                   </div>
 
@@ -917,30 +926,30 @@
                       <div 
                         key={zikr.id}
                         onClick={() => switchToZikr(zikr.text)} 
-                        className="bg-dark-100 border border-dark-200 rounded-lg shadow-sm p-4 cursor-pointer"
+                        className="bg-[color:--card-bg] border border-[color:--card-border] rounded-lg shadow-sm p-4 cursor-pointer"
                       >
                         <div className="flex justify-between">
-                          <h3 className="text-white font-medium">{zikr.text}</h3>
+                          <h3 className="font-medium">{zikr.text}</h3>
                           <div className="flex space-x-2 space-x-reverse">
                             <button 
                               onClick={(e) => editZikr(zikr.id, e)}
-                              className="w-8 h-8 flex items-center justify-center text-dark-500 bg-dark-200 rounded-full cursor-pointer"
+                              className="w-8 h-8 flex items-center justify-center text-[color:--text-color] bg-[color:--button-bg] rounded-full cursor-pointer"
                             >
                               <span>✎</span>
                             </button>
                             <button 
                               onClick={(e) => deleteZikr(zikr.id, e)}
-                              className="w-8 h-8 flex items-center justify-center text-dark-500 bg-dark-200 rounded-full cursor-pointer"
+                              className="w-8 h-8 flex items-center justify-center text-[color:--text-color] bg-[color:--button-bg] rounded-full cursor-pointer"
                             >
-                              <span>🗑️</span>
+                              <span>✖️</span>
                             </button>
                           </div>
                         </div>
                         <div className="mt-2 flex justify-between text-sm">
-                          <span className="text-dark-500">العدد اليومي: {zikr.dailyCount}</span>
+                          <span className="zikr-count">العدد اليومي: {zikr.dailyCount}</span>
                         </div>
                         <div className="mt-1 flex justify-between text-sm">
-                          <span className="text-dark-500">العدد الكلي: {zikr.totalCount}</span>
+                          <span className="zikr-count">العدد الكلي: {zikr.totalCount}</span>
                         </div>
                       </div>
                     ))}
@@ -962,23 +971,23 @@
               <div className="px-4 py-6">
                 <div className="mt-4">
                   <div className="text-center mb-6">
-                    <h2 className="text-lg font-medium text-white">{formatDate()}</h2>
+                    <h2 className="text-lg font-medium">{formatDate()}</h2>
                   </div>
 
                   <div className="space-y-4">
-                    <div className="bg-dark-100 border border-dark-200 rounded-lg shadow-sm p-5">
+                    <div className="bg-[color:--card-bg] border border-[color:--card-border] rounded-lg shadow-sm p-5">
                       <div className="flex items-center">
                         <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center ml-4">
                           <span className="text-primary text-xl">📅</span>
                         </div>
                         <div>
-                          <h3 className="text-dark-500 text-sm">التسبيحات اليومية</h3>
-                          <p className="text-3xl font-bold text-white mt-1">{state.stats.daily}</p>
+                          <h3 className="text-[color:--text-color] text-sm">التسبيحات اليومية</h3>
+                          <p className="text-3xl font-bold mt-1">{state.stats.daily}</p>
                         </div>
                         <div className="mr-auto">
                           <button 
                             onClick={(e) => editGoal('daily', e)}
-                            className="w-8 h-8 flex items-center justify-center text-dark-500 bg-dark-200 rounded-full"
+                            className="w-8 h-8 flex items-center justify-center text-[color:--text-color] bg-[color:--button-bg] rounded-full"
                           >
                             <span>✎</span>
                           </button>
@@ -986,12 +995,12 @@
                       </div>
                       <div className="mt-4">
                         <div className="flex justify-between text-sm mb-1">
-                          <span className="text-dark-500">الهدف اليومي</span>
+                          <span className="text-[color:--text-color]">الهدف اليومي</span>
                           <span className="text-primary">
                             {state.stats.daily} / {state.stats.goals.daily}
                           </span>
                         </div>
-                        <div className="w-full bg-dark-200 rounded-full h-2">
+                        <div className="w-full bg-[color:--progress-bar-bg] rounded-full h-2">
                           <div 
                             className="bg-primary h-2 rounded-full" 
                             style={{ width: `${statsDaily}%` }}
@@ -1000,19 +1009,19 @@
                       </div>
                     </div>
 
-                    <div className="bg-dark-100 border border-dark-200 rounded-lg shadow-sm p-5">
+                    <div className="bg-[color:--card-bg] border border-[color:--card-border] rounded-lg shadow-sm p-5">
                       <div className="flex items-center">
                         <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center ml-4">
                           <span className="text-primary text-xl">📅</span>
                         </div>
                         <div>
-                          <h3 className="text-dark-500 text-sm">التسبيحات الشهرية</h3>
-                          <p className="text-3xl font-bold text-white mt-1">{state.stats.monthly}</p>
+                          <h3 className="text-[color:--text-color] text-sm">التسبيحات الشهرية</h3>
+                          <p className="text-3xl font-bold mt-1">{state.stats.monthly}</p>
                         </div>
                         <div className="mr-auto">
                           <button 
                             onClick={(e) => editGoal('monthly', e)}
-                            className="w-8 h-8 flex items-center justify-center text-dark-500 bg-dark-200 rounded-full"
+                            className="w-8 h-8 flex items-center justify-center text-[color:--text-color] bg-[color:--button-bg] rounded-full"
                           >
                             <span>✎</span>
                           </button>
@@ -1020,12 +1029,12 @@
                       </div>
                       <div className="mt-4">
                         <div className="flex justify-between text-sm mb-1">
-                          <span className="text-dark-500">الهدف الشهري</span>
+                          <span className="text-[color:--text-color]">الهدف الشهري</span>
                           <span className="text-primary">
                             {state.stats.monthly} / {state.stats.goals.monthly}
                           </span>
                         </div>
-                        <div className="w-full bg-dark-200 rounded-full h-2">
+                        <div className="w-full bg-[color:--progress-bar-bg] rounded-full h-2">
                           <div 
                             className="bg-primary h-2 rounded-full" 
                             style={{ width: `${statsMonthly}%` }}
@@ -1034,14 +1043,14 @@
                       </div>
                     </div>
 
-                    <div className="bg-dark-100 border border-dark-200 rounded-lg shadow-sm p-5">
+                    <div className="bg-[color:--card-bg] border border-[color:--card-border] rounded-lg shadow-sm p-5">
                       <div className="flex items-center">
                         <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center ml-4">
                           <span className="text-primary text-xl">🏆</span>
                         </div>
                         <div>
-                          <h3 className="text-dark-500 text-sm">المجموع الكلي</h3>
-                          <p className="text-3xl font-bold text-white mt-1">{state.stats.total}</p>
+                          <h3 className="text-[color:--text-color] text-sm">المجموع الكلي</h3>
+                          <p className="text-3xl font-bold mt-1">{state.stats.total}</p>
                         </div>
                       </div>
                     </div>
@@ -1053,13 +1062,32 @@
             {activeTab === 'settings' && (
               <div className="px-4 py-6">
                 <div className="mt-4 space-y-4">
-                  <div className="bg-dark-100 border border-dark-200 rounded-lg shadow-sm p-4">
+                  <div className="bg-[color:--card-bg] border border-[color:--card-border] rounded-lg shadow-sm p-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center">
+                        <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center ml-3">
+                          <span className="text-primary">🌙</span>
+                        </div>
+                        <span>الوضع الداكن</span>
+                      </div>
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input 
+                          type="checkbox" 
+                          className="sr-only peer"
+                          checked={state.settings.theme === 'dark'}
+                          onChange={(e) => updateSetting('theme', e.target.checked ? 'dark' : 'light')}
+                        />
+                        <div className="w-11 h-6 bg-[color:--button-bg] peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-[color:--text-color] after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-[color:--text-color] after:border-[color:--card-border] after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                      </label>
+                    </div>
+                  </div>
+                  <div className="bg-[color:--card-bg] border border-[color:--card-border] rounded-lg shadow-sm p-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center">
                         <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center ml-3">
                           <span className="text-primary">🔊</span>
                         </div>
-                        <span className="text-white">الصوت</span>
+                        <span>الصوت</span>
                       </div>
                       <label className="relative inline-flex items-center cursor-pointer">
                         <input 
@@ -1068,18 +1096,18 @@
                           checked={state.settings.sound}
                           onChange={(e) => updateSetting('sound', e.target.checked)}
                         />
-                        <div className="w-11 h-6 bg-dark-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-dark-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                        <div className="w-11 h-6 bg-[color:--button-bg] peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-[color:--text-color] after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-[color:--text-color] after:border-[color:--card-border] after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
                       </label>
                     </div>
                   </div>
 
-                  <div className="bg-dark-100 border border-dark-200 rounded-lg shadow-sm p-4">
+                  <div className="bg-[color:--card-bg] border border-[color:--card-border] rounded-lg shadow-sm p-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center">
                         <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center ml-3">
                           <span className="text-primary">📳</span>
                         </div>
-                        <span className="text-white">الاهتزاز</span>
+                        <span>الاهتزاز</span>
                       </div>
                       <label className="relative inline-flex items-center cursor-pointer">
                         <input 
@@ -1088,17 +1116,17 @@
                           checked={state.settings.vibration}
                           onChange={(e) => updateSetting('vibration', e.target.checked)}
                         />
-                        <div className="w-11 h-6 bg-dark-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-dark-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                        <div className="w-11 h-6 bg-[color:--button-bg] peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-[color:--text-color] after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-[color:--text-color] after:border-[color:--card-border] after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
                       </label>
                     </div>
                   </div>
 
-                  <div className="bg-dark-100 border border-dark-200 rounded-lg shadow-sm p-4">
+                  <div className="bg-[color:--card-bg] border border-[color:--card-border] rounded-lg shadow-sm p-4">
                     <div className="flex items-center">
                       <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center ml-3">
                         <span className="text-primary">ℹ️</span>
                       </div>
-                      <button onClick={showAbout} className="text-white">عن التطبيق</button>
+                      <button onClick={showAbout} className="text-[color:--text-color]">عن التطبيق</button>
                     </div>
                   </div>
                 </div>
@@ -1106,11 +1134,11 @@
             )}
           </div>
 
-          <div className="fixed bottom-0 w-full bg-dark-100 border-t border-dark-200 shadow-sm z-10 max-w-md">
+          <div className="fixed bottom-0 w-full bg-[color:--card-bg] border-t border-[color:--card-border] shadow-sm z-10 max-w-md">
             <div className="grid grid-cols-4 h-16">
               <button 
                 onClick={() => setActiveTab('tasbih')}
-                className={`flex flex-col items-center justify-center cursor-pointer ${activeTab === 'tasbih' ? 'text-primary' : 'text-dark-500'}`}
+                className={`flex flex-col items-center justify-center cursor-pointer ${activeTab === 'tasbih' ? 'text-primary' : 'text-[color:--text-color]'}`}
               >
                 <div className="w-6 h-6 flex items-center justify-center">
                   <span className="text-xl">📿</span>
@@ -1119,7 +1147,7 @@
               </button>
               <button 
                 onClick={() => setActiveTab('azkar')}
-                className={`flex flex-col items-center justify-center cursor-pointer ${activeTab === 'azkar' ? 'text-primary' : 'text-dark-500'}`}
+                className={`flex flex-col items-center justify-center cursor-pointer ${activeTab === 'azkar' ? 'text-primary' : 'text-[color:--text-color]'}`}
               >
                 <div className="w-6 h-6 flex items-center justify-center">
                   <span className="text-xl">📖</span>
@@ -1128,7 +1156,7 @@
               </button>
               <button 
                 onClick={() => setActiveTab('stats')}
-                className={`flex flex-col items-center justify-center cursor-pointer ${activeTab === 'stats' ? 'text-primary' : 'text-dark-500'}`}
+                className={`flex flex-col items-center justify-center cursor-pointer ${activeTab === 'stats' ? 'text-primary' : 'text-[color:--text-color]'}`}
               >
                 <div className="w-6 h-6 flex items-center justify-center">
                   <span className="text-xl">📊</span>
@@ -1137,7 +1165,7 @@
               </button>
               <button 
                 onClick={() => setActiveTab('settings')}
-                className={`flex flex-col items-center justify-center cursor-pointer ${activeTab === 'settings' ? 'text-primary' : 'text-dark-500'}`}
+                className={`flex flex-col items-center justify-center cursor-pointer ${activeTab === 'settings' ? 'text-primary' : 'text-[color:--text-color]'}`}
               >
                 <div className="w-6 h-6 flex items-center justify-center">
                   <span className="text-xl">⚙️</span>
