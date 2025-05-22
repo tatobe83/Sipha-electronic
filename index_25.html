@@ -1,0 +1,1164 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="/vite.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>مسبحة الماكن الإلكترونية</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/react@18.2.0/umd/react.production.min.js" onerror='console.error("Failed to load React")'></script>
+  <script src="https://unpkg.com/react-dom@18.2.0/umd/react-dom.production.min.js" onerror='console.error("Failed to load ReactDOM")'></script>
+  <script src="https://cdn.tailwindcss.com/3.4.1"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: "#9333EA",
+            secondary: "#4C1D95",
+            dark: {
+              100: "#1a1a1a",
+              200: "#2d2d2d",
+              300: "#404040",
+              400: "#525252",
+              500: "#737373",
+              600: "#a3a3a3",
+              700: "#d4d4d4",
+              800: "#f5f5f5",
+              900: "#ffffff"
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      font-family: Tajawal, sans-serif;
+      direction: rtl;
+      background-color: #000;
+      color: #fff;
+    }
+    @keyframes ripple {
+      0% { transform: scale(0); opacity: .5; }
+      100% { transform: scale(1.5); opacity: 0; }
+    }
+    .ripple-effect {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle, rgba(147,51,234,.4) 10%, transparent 10.01%);
+      border-radius: 50%;
+      animation: ripple .5s ease-out;
+      pointer-events: none;
+    }
+    .circle-button {
+      transition: transform .1s ease, box-shadow .1s ease;
+    }
+    .circle-button:active {
+      transform: scale(.85);
+      box-shadow: 0 2px 4px rgba(0,0,0,.3);
+    }
+    .progress-circle {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      transform: rotate(-90deg);
+    }
+    .progress-circle-bg {
+      fill: none;
+      stroke: #ffffff; /* تغيير اللون إلى الأبيض */
+      stroke-width: 8;
+    }
+    .progress-circle-fill {
+      fill: none;
+      stroke: #9333EA;
+      stroke-width: 8;
+      stroke-linecap: round;
+      transition: stroke-dashoffset .3s ease;
+    }
+    .card {
+      background-color: #1a1a1a;
+      border: 1px solid #2d2d2d;
+    }
+    .progress-bar {
+      background-color: #2d2d2d;
+    }
+    .progress-fill {
+      background-color: #9333ea;
+    }
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+    }
+    .modal-content {
+      background: #1a1a1a;
+      padding: 20px;
+      border-radius: 8px;
+      border: 1px solid #2d2d2d;
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+  </script>
+  <script type="text/babel">
+    function Modal({ isOpen, onClose, onSubmit, title, defaultValue = '', type = 'text', isConfirm = false }) {
+      const [inputValue, setInputValue] = React.useState(defaultValue);
+
+      React.useEffect(() => {
+        setInputValue(defaultValue);
+        console.log('Modal: defaultValue updated to:', defaultValue);
+      }, [defaultValue]);
+
+      if (!isOpen) {
+        console.log('Modal: Not open, returning null');
+        return null;
+      }
+
+      const handleConfirm = () => {
+        console.log('Modal: handleConfirm called with value:', inputValue, 'isConfirm:', isConfirm);
+        try {
+          if (!onSubmit) {
+            console.error('Modal: onSubmit is not defined');
+            alert('خطأ: دالة التأكيد غير معرفة');
+            onClose();
+            return;
+          }
+          onSubmit(isConfirm ? true : inputValue);
+          console.log('Modal: onSubmit executed successfully');
+          onClose();
+        } catch (error) {
+          console.error('Modal: Error in handleConfirm:', error);
+          alert('حدث خطأ أثناء تنفيذ الإجراء: ' + error.message);
+          onClose();
+        }
+      };
+
+      return (
+        <div 
+          className="modal-overlay" 
+          onClick={isConfirm ? onClose : undefined}
+        >
+          <div 
+            className="modal-content" 
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 className="text-lg font-medium text-primary mb-4">{title}</h2>
+            {!isConfirm && (
+              <input
+                type={type}
+                value={inputValue}
+                onChange={(e) => {
+                  setInputValue(e.target.value);
+                  console.log('Modal: Input changed to:', e.target.value);
+                }}
+                className="w-full py-2 px-4 bg-dark-100 border border-dark-200 rounded-lg text-white mb-4"
+                placeholder="أدخل القيمة..."
+              />
+            )}
+            {isConfirm && (
+              <div className="text-white mb-4">
+                {type === 'about' ? (
+                  <>
+                    <p>مسبحة الماكن الإلكترونية - الإصدار 1.0.0</p>
+                    <p>تطبيق يساعدك على تسبيح الله وذكره في أي وقت ومكان.</p>
+                    <p className="mt-2">المميزات الرئيسية:</p>
+                    <ul className="list-disc mr-4 text-right">
+                      <li>عداد تسبيح سهل الاستخدام</li>
+                      <li>إمكانية إضافة وتعديل الأذكار المخصصة</li>
+                      <li>متابعة الإحصائيات اليومية والشهرية</li>
+                      <li>إمكانية ضبط الأهداف اليومية والشهرية</li>
+                    </ul>
+                  </>
+                ) : (
+                  <p>{title}</p>
+                )}
+              </div>
+            )}
+            <div className="flex justify-center">
+              {type !== 'about' && isConfirm && (
+                <button
+                  type="button"
+                  onClick={handleConfirm}
+                  className="bg-primary text-white px-4 py-2 rounded-lg mx-2"
+                >
+                  تأكيد
+                </button>
+              )}
+              {!isConfirm && (
+                <button
+                  type="button"
+                  onClick={handleConfirm}
+                  className="bg-primary text-white px-4 py-2 rounded-lg mx-2"
+                >
+                  تأكيد
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={() => {
+                  console.log('Modal: Cancel button clicked');
+                  onClose();
+                }}
+                className="bg-dark-200 text-white px-4 py-2 rounded-lg mx-2"
+              >
+                إلغاء
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    function App() {
+      console.log('App: Component rendered');
+      const [state, setState] = React.useState({
+        count: 0,
+        dailyCount: 0,
+        currentZikr: 'سبحان الله',
+        azkar: [
+          { id: '1', text: 'سبحان الله', dailyCount: 0, totalCount: 0, circleGoal: 33 },
+          { id: '2', text: 'الحمد لله', dailyCount: 0, totalCount: 0, circleGoal: 33 },
+          { id: '3', text: 'الله أكبر', dailyCount: 0, totalCount: 0, circleGoal: 33 },
+          { id: '4', text: 'لا إله إلا الله', dailyCount: 0, totalCount: 0, circleGoal: 33 },
+          { id: '5', text: 'أستغفر الله', dailyCount: 0, totalCount: 0, circleGoal: 33 }
+        ],
+        settings: {
+          sound: true,
+          vibration: true
+        },
+        stats: {
+          daily: 0,
+          monthly: 0,
+          total: 0,
+          goals: {
+            daily: 100,
+            monthly: 8000
+          },
+          lastZikr: {
+            text: '',
+            count: 0
+          }
+        }
+      });
+
+      const [activeTab, setActiveTab] = React.useState('tasbih');
+      const [searchTerm, setSearchTerm] = React.useState('');
+      const [modal, setModal] = React.useState({ isOpen: false, type: '', data: {}, isConfirm: false });
+      const [sound] = React.useState(new Audio('https://soundbible.com/mp3/Click2-Sebastian-759472264.mp3'));
+      const [isPressed, setIsPressed] = React.useState(false);
+
+      React.useEffect(() => {
+        console.log('App: Loading state from localStorage');
+        try {
+          const savedState = localStorage.getItem('tasbihState');
+          const lastResetDate = localStorage.getItem('lastResetDate');
+          const today = new Date().toISOString().split('T')[0];
+
+          if (savedState) {
+            let parsedState = JSON.parse(savedState);
+            
+            if (lastResetDate !== today) {
+              console.log('App: New day detected, resetting daily counters');
+              parsedState = {
+                ...parsedState,
+                dailyCount: 0,
+                azkar: parsedState.azkar.map(z => ({ ...z, dailyCount: 0 })),
+                stats: {
+                  ...parsedState.stats,
+                  daily: 0
+                }
+              };
+              localStorage.setItem('lastResetDate', today);
+              localStorage.setItem('tasbihState', JSON.stringify(parsedState));
+              console.log('App: Daily counters reset and saved to localStorage');
+            }
+            
+            setState(parsedState);
+            console.log('App: State loaded from localStorage:', parsedState);
+          } else {
+            localStorage.setItem('lastResetDate', today);
+          }
+        } catch (error) {
+          console.error('App: Error parsing saved state or resetting counters:', error);
+        }
+      }, []);
+
+      React.useEffect(() => {
+        try {
+          localStorage.setItem('tasbihState', JSON.stringify(state));
+          console.log('App: State saved to localStorage:', state);
+        } catch (error) {
+          console.error('App: Error saving state to localStorage:', error);
+        }
+      }, [state]);
+
+      const incrementCounter = (e) => {
+        e.stopPropagation();
+        console.log('App: incrementCounter triggered');
+        try {
+          const zikr = state.azkar.find(z => z.text === state.currentZikr);
+          if (!zikr) {
+            console.error('App: Current zikr not found:', state.currentZikr);
+            return;
+          }
+
+          setState(prevState => {
+            const newCount = prevState.count + 1;
+            const newDailyCount = prevState.dailyCount + 1;
+            const newDaily = prevState.stats.daily + 1;
+            const newMonthly = prevState.stats.monthly + 1;
+            const newTotal = prevState.stats.total + 1;
+            
+            const resetCount = newCount >= zikr.circleGoal ? 0 : newCount;
+            
+            const updatedAzkar = prevState.azkar.map(z => 
+              z.text === state.currentZikr 
+                ? { ...z, dailyCount: z.dailyCount + 1, totalCount: z.totalCount + 1 } 
+                : z
+            );
+            
+            if (prevState.settings.sound) {
+              const clonedSound = sound.cloneNode();
+              clonedSound.play().catch(err => {
+                console.error('App: Error playing sound:', err);
+              });
+            }
+            
+            if (prevState.settings.vibration && 'vibrate' in navigator) {
+              navigator.vibrate(50);
+            }
+            
+            return {
+              ...prevState,
+              count: resetCount,
+              dailyCount: newDailyCount,
+              stats: {
+                ...prevState.stats,
+                daily: newDaily,
+                monthly: newMonthly,
+                total: newTotal,
+                lastZikr: {
+                  text: state.currentZikr,
+                  count: prevState.stats.lastZikr.text === state.currentZikr ? 
+                    prevState.stats.lastZikr.count + 1 : 1
+                }
+              },
+              azkar: updatedAzkar
+            };
+          });
+        } catch (error) {
+          console.error('App: Error in incrementCounter:', error);
+        }
+      };
+
+      const handleMouseDown = () => {
+        setIsPressed(true);
+      };
+
+      const handleMouseUp = () => {
+        setIsPressed(false);
+      };
+
+      const resetCounter = (e) => {
+        e.stopPropagation();
+        console.log('App: resetCounter triggered');
+        try {
+          setState(prevState => ({
+            ...prevState,
+            count: 0
+          }));
+        } catch (error) {
+          console.error('App: Error in resetCounter:', error);
+        }
+      };
+
+      const openModal = (type, data = {}, isConfirm = false) => {
+        console.log('App: openModal called with type:', type, 'data:', data, 'isConfirm:', isConfirm);
+        try {
+          setModal({ isOpen: true, type, data, isConfirm });
+          console.log('App: Modal state updated:', { isOpen: true, type, data, isConfirm });
+        } catch (error) {
+          console.error('App: Error in openModal:', error);
+          alert('خطأ أثناء فتح النافذة: ' + error.message);
+        }
+      };
+
+      const closeModal = () => {
+        console.log('App: closeModal called');
+        try {
+          setModal({ isOpen: false, type: '', data: {}, isConfirm: false });
+          console.log('App: Modal closed');
+        } catch (error) {
+          console.error('App: Error in closeModal:', error);
+        }
+      };
+
+      const editCurrentZikrGoal = (e) => {
+        e.stopPropagation();
+        console.log('App: editCurrentZikrGoal triggered');
+        try {
+          const zikr = state.azkar.find(z => z.text === state.currentZikr);
+          if (!zikr) {
+            console.error('App: Current zikr not found:', state.currentZikr);
+            alert('خطأ: الذكر الحالي غير موجود');
+            return;
+          }
+          openModal('editZikrGoal', { zikr, defaultValue: zikr.circleGoal.toString() });
+        } catch (error) {
+          console.error('App: Error in editCurrentZikrGoal:', error);
+        }
+      };
+
+      const handleEditZikrGoal = (value) => {
+        console.log('App: handleEditZikrGoal called with value:', value);
+        try {
+          const goalValue = parseInt(value);
+          if (isNaN(goalValue) || goalValue <= 0) {
+            console.warn('App: Invalid goal value:', value);
+            alert('يرجى إدخال رقم صحيح إيجابي');
+            return;
+          }
+          const zikr = modal.data.zikr;
+          if (!zikr) {
+            console.error('App: Zikr not found in modal data');
+            alert('خطأ: الذكر غير موجود');
+            return;
+          }
+          setState(prevState => ({
+            ...prevState,
+            count: 0,
+            azkar: prevState.azkar.map(z => 
+              z.id === zikr.id ? { ...z, circleGoal: goalValue } : z
+            )
+          }));
+          console.log('App: Zikr goal updated successfully');
+        } catch (error) {
+          console.error('App: Error in handleEditZikrGoal:', error);
+          alert('حدث خطأ أثناء تعديل الهدف: ' + error.message);
+        }
+      };
+
+      const switchToZikr = (zikrText) => {
+        console.log('App: switchToZikr triggered:', zikrText);
+        try {
+          setState(prevState => ({
+            ...prevState,
+            currentZikr: zikrText,
+            count: 0
+          }));
+          setActiveTab('tasbih');
+        } catch (error) {
+          console.error('App: Error in switchToZikr:', error);
+        }
+      };
+
+      const addZikr = (e) => {
+        e.stopPropagation();
+        console.log('App: addZikr triggered');
+        try {
+          openModal('addZikr', { defaultValue: '' });
+        } catch (error) {
+          console.error('App: Error in addZikr:', error);
+        }
+      };
+
+      const handleAddZikr = (text) => {
+        console.log('App: handleAddZikr called with text:', text);
+        try {
+          if (!text || !text.trim()) {
+            console.warn('App: Empty zikr text');
+            alert('يرجى إدخال نص الذكر');
+            return;
+          }
+          const trimmedText = text.trim();
+          if (state.azkar.some(z => z.text === trimmedText)) {
+            console.warn('App: Duplicate zikr:', trimmedText);
+            alert('الذكر موجود بالفعل');
+            return;
+          }
+          const newZikr = {
+            id: Date.now().toString(),
+            text: trimmedText,
+            dailyCount: 0,
+            totalCount: 0,
+            circleGoal: 33
+          };
+          setState(prevState => ({
+            ...prevState,
+            azkar: [...prevState.azkar, newZikr]
+          }));
+          console.log('App: Zikr added successfully');
+        } catch (error) {
+          console.error('App: Error in handleAddZikr:', error);
+          alert('حدث خطأ أثناء إضافة الذكر: ' + error.message);
+        }
+      };
+
+      const editZikr = (id, e) => {
+        e.stopPropagation();
+        console.log('App: editZikr triggered:', id);
+        try {
+          const zikr = state.azkar.find(z => z.id === id);
+          if (!zikr) {
+            console.error('App: Zikr not found:', id);
+            alert('خطأ: الذكر غير موجود');
+            return;
+          }
+          openModal('editZikr', { zikr, defaultValue: zikr.text });
+        } catch (error) {
+          console.error('App: Error in editZikr:', error);
+        }
+      };
+
+      const handleEditZikr = (text) => {
+        console.log('App: handleEditZikr called with text:', text);
+        try {
+          if (!text || !text.trim()) {
+            console.warn('App: Empty zikr text');
+            alert('يرجى إدخال نص الذكر');
+            return;
+          }
+          const trimmedText = text.trim();
+          const zikr = modal.data.zikr;
+          if (!zikr) {
+            console.error('App: Zikr not found in modal data');
+            alert('خطأ: الذكر غير موجود');
+            return;
+          }
+          if (state.azkar.some(z => z.text === trimmedText && z.id !== zikr.id)) {
+            console.warn('App: Duplicate zikr:', trimmedText);
+            alert('الذكر موجود بالفعل');
+            return;
+          }
+          setState(prevState => ({
+            ...prevState,
+            azkar: prevState.azkar.map(z => 
+              z.id === zikr.id ? { ...z, text: trimmedText } : z
+            ),
+            currentZikr: zikr.text === prevState.currentZikr ? trimmedText : prevState.currentZikr
+          }));
+          console.log('App: Zikr edited successfully');
+        } catch (error) {
+          console.error('App: Error in handleEditZikr:', error);
+          alert('حدث خطأ أثناء تعديل الذكر: ' + error.message);
+        }
+      };
+
+      const deleteZikr = (id, e) => {
+        e.stopPropagation();
+        console.log('App: deleteZikr triggered with id:', id);
+        try {
+          const zikr = state.azkar.find(z => z.id === id);
+          if (!zikr) {
+            console.error('App: Zikr not found for id:', id);
+            alert('خطأ: الذكر غير موجود');
+            return;
+          }
+          openModal('deleteZikr', { zikr }, true);
+          console.log('App: Modal opened for deleteZikr');
+        } catch (error) {
+          console.error('App: Error in deleteZikr:', error);
+          alert('خطأ أثناء محاولة حذف الذكر: ' + error.message);
+        }
+      };
+
+      const handleDeleteZikr = () => {
+        console.log('App: handleDeleteZikr called for zikr:', modal.data.zikr?.text);
+        try {
+          const zikr = modal.data.zikr;
+          if (!zikr) {
+            console.error('App: Zikr not found in modal data');
+            alert('خطأ: الذكر غير موجود');
+            return;
+          }
+          setState(prevState => {
+            let newCurrentZikr = prevState.currentZikr;
+            if (zikr.text === prevState.currentZikr) {
+              const remainingAzkar = prevState.azkar.filter(z => z.id !== zikr.id);
+              newCurrentZikr = remainingAzkar.length > 0 ? remainingAzkar[0].text : '';
+            }
+            return {
+              ...prevState,
+              azkar: prevState.azkar.filter(z => z.id !== zikr.id),
+              currentZikr: newCurrentZikr,
+              count: 0
+            };
+          });
+          console.log('App: Zikr deleted successfully');
+        } catch (error) {
+          console.error('App: Error in handleDeleteZikr:', error);
+          alert('حدث خطأ أثناء حذف الذكر: ' + error.message);
+        }
+      };
+
+      const editGoal = (type, e) => {
+        e.stopPropagation();
+        console.log('App: editGoal triggered:', type);
+        try {
+          const currentGoal = state.stats.goals[type];
+          openModal('editGoal', { type, defaultValue: currentGoal.toString() });
+        } catch (error) {
+          console.error('App: Error in editGoal:', error);
+        }
+      };
+
+      const handleEditGoal = (value) => {
+        console.log('App: handleEditGoal called with value:', value);
+        try {
+          const goalValue = parseInt(value);
+          if (isNaN(goalValue) || goalValue <= 0) {
+            console.warn('App: Invalid goal value:', value);
+            alert('يرجى إدخال رقم صحيح إيجابي');
+            return;
+          }
+          setState(prevState => ({
+            ...prevState,
+            stats: {
+              ...prevState.stats,
+              goals: {
+                ...prevState.stats.goals,
+                [modal.data.type]: goalValue
+              }
+            }
+          }));
+          console.log('App: Goal updated successfully');
+        } catch (error) {
+          console.error('App: Error in handleEditGoal:', error);
+          alert('حدث خطأ أثناء تعديل الهدف: ' + error.message);
+        }
+      };
+
+      const updateSetting = (setting, value) => {
+        console.log('App: updateSetting triggered:', setting, value);
+        try {
+          setState(prevState => ({
+            ...prevState,
+            settings: {
+              ...prevState.settings,
+              [setting]: value
+            }
+          }));
+        } catch (error) {
+          console.error('App: Error in updateSetting:', error);
+        }
+      };
+
+      const showAbout = (e) => {
+        e.stopPropagation();
+        console.log('App: showAbout triggered');
+        try {
+          openModal('about', {}, true);
+          console.log('App: Modal opened for about');
+        } catch (error) {
+          console.error('App: Error in showAbout:', error);
+          alert('خطأ أثناء فتح نافذة عن التطبيق: ' + error.message);
+        }
+      };
+
+      const filteredAzkar = state.azkar.filter(zikr => 
+        zikr.text.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+
+      const dailyProgress = Math.min((state.dailyCount / state.stats.goals.daily) * 100, 100);
+      const statsDaily = Math.min((state.stats.daily / state.stats.goals.daily) * 100, 100);
+      const statsMonthly = Math.min((state.stats.monthly / state.stats.goals.monthly) * 100, 100);
+
+      const formatDate = () => {
+        try {
+          return new Intl.DateTimeFormat('ar-SA', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+          }).format(new Date());
+        } catch (error) {
+          console.error('App: Error in formatDate:', error);
+          return '';
+        }
+      };
+
+      const currentZikr = state.azkar.find(z => z.text === state.currentZikr);
+      const circleProgress = currentZikr ? Math.min((state.count / currentZikr.circleGoal) * 100, 100) : 0;
+      const circumference = 2 * Math.PI * 120;
+      const offset = circumference - (circleProgress / 100) * circumference;
+
+      return (
+        <div className="min-h-screen bg-black text-white mx-auto max-w-md">
+          <Modal
+            isOpen={modal.isOpen && modal.type === 'editZikrGoal'}
+            onClose={closeModal}
+            onSubmit={handleEditZikrGoal}
+            title={`تعديل هدف الدائرة لـ "${modal.data.zikr?.text || ''}"`}
+            defaultValue={modal.data.defaultValue || ''}
+            type="number"
+          />
+          <Modal
+            isOpen={modal.isOpen && modal.type === 'addZikr'}
+            onClose={closeModal}
+            onSubmit={handleAddZikr}
+            title="إضافة ذكر جديد"
+            defaultValue={modal.data.defaultValue || ''}
+          />
+          <Modal
+            isOpen={modal.isOpen && modal.type === 'editZikr'}
+            onClose={closeModal}
+            onSubmit={handleEditZikr}
+            title="تعديل الذكر"
+            defaultValue={modal.data.defaultValue || ''}
+          />
+          <Modal
+            isOpen={modal.isOpen && modal.type === 'deleteZikr'}
+            onClose={closeModal}
+            onSubmit={handleDeleteZikr}
+            title={`هل تريد حذف "${modal.data.zikr?.text || ''}"؟`}
+            isConfirm={true}
+          />
+          <Modal
+            isOpen={modal.isOpen && modal.type === 'editGoal'}
+            onClose={closeModal}
+            onSubmit={handleEditGoal}
+            title={modal.data.type === 'daily' ? 'تعديل الهدف اليومي' : 'تعديل الهدف الشهري'}
+            defaultValue={modal.data.defaultValue || ''}
+            type="number"
+          />
+          <Modal
+            isOpen={modal.isOpen && modal.type === 'about'}
+            onClose={closeModal}
+            title="عن التطبيق"
+            type="about"
+            isConfirm={true}
+          />
+
+          <div className="fixed top-0 w-full bg-dark-100 border-b border-dark-200 z-10 max-w-md">
+            <div className="flex items-center justify-center h-14 px-4">
+              <h1 className="text-xl font-bold text-primary">مسبحة الماكن الإلكترونية</h1>
+            </div>
+          </div>
+
+          <div className="pt-16 pb-16">
+            {activeTab === 'tasbih' && (
+              <div className="px-4 py-6">
+                <div className="flex flex-col items-center justify-center mt-8">
+                  <h2 className="text-xl font-medium text-white mb-4">{state.currentZikr}</h2>
+                  
+                  <div className="relative w-72 h-72 flex items-center justify-center">
+                    <svg className="progress-circle" width="272" height="272" viewBox="0 0 272 272">
+                      <circle
+                        className="progress-circle-bg"
+                        cx="136"
+                        cy="136"
+                        r="120"
+                      />
+                      <circle
+                        className="progress-circle-fill"
+                        cx="136"
+                        cy="136"
+                        r="120"
+                        strokeDasharray={circumference}
+                        strokeDashoffset={offset}
+                      />
+                    </svg>
+                    <div 
+                      onClick={incrementCounter}
+                      onMouseDown={handleMouseDown}
+                      onMouseUp={handleMouseUp}
+                      onTouchStart={handleMouseDown}
+                      onTouchEnd={handleMouseUp}
+                      className={`circle-button bg-dark-100 border border-dark-200 shadow-lg rounded-full w-64 h-64 flex items-center justify-center cursor-pointer relative overflow-hidden ${isPressed ? 'active' : ''}`}
+                    >
+                      {isPressed && <div className="ripple-effect"></div>}
+                      <div className="text-center">
+                        <h2 className="text-6xl font-bold text-white">{state.count}</h2>
+                      </div>
+                    </div>
+                    <button 
+                      onClick={resetCounter}
+                      className="absolute top-[280px] right-4 w-12 h-12 rounded-full bg-dark-100 border border-dark-200 shadow-md flex items-center justify-center cursor-pointer transition-transform hover:scale-110"
+                    >
+                      <span className="text-primary text-xl">↺</span>
+                    </button>
+                    <button 
+                      onClick={editCurrentZikrGoal}
+                      className="absolute top-[280px] left-4 w-12 h-12 rounded-full bg-dark-100 border border-dark-200 shadow-md flex items-center justify-center cursor-pointer transition-transform hover:scale-110"
+                    >
+                      <span className="text-dark-500 text-xl">✎</span>
+                    </button>
+                  </div>
+
+                  <div className="mt-24 bg-dark-100 border border-dark-200 rounded-lg shadow-sm p-4 w-full">
+                    <div className="flex justify-between items-center">
+                      <span className="text-white">الهدف اليومي</span>
+                      <span className="text-white font-medium">
+                        {state.dailyCount} / {state.stats.goals.daily}
+                      </span>
+                    </div>
+                    <div className="w-full bg-dark-200 rounded-full h-2 mt-2">
+                      <div 
+                        className="bg-primary h-2 rounded-full" 
+                        style={{ width: `${dailyProgress}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'azkar' && (
+              <div className="px-4 py-6">
+                <div className="mt-2 space-y-4">
+                  <div className="relative mb-6">
+                    <input 
+                      type="text" 
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      placeholder="ابحث عن ذكر..." 
+                      className="w-full py-3 px-4 bg-dark-100 border border-dark-200 rounded-lg shadow-sm pl-10 text-white placeholder-dark-500"
+                    />
+                    <div className="absolute left-3 top-3 w-6 h-6 flex items-center justify-center">
+                      <span className="text-dark-500">🔍</span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    {filteredAzkar.map(zikr => (
+                      <div 
+                        key={zikr.id}
+                        onClick={() => switchToZikr(zikr.text)} 
+                        className="bg-dark-100 border border-dark-200 rounded-lg shadow-sm p-4 cursor-pointer"
+                      >
+                        <div className="flex justify-between">
+                          <h3 className="text-white font-medium">{zikr.text}</h3>
+                          <div className="flex space-x-2 space-x-reverse">
+                            <button 
+                              onClick={(e) => editZikr(zikr.id, e)}
+                              className="w-8 h-8 flex items-center justify-center text-dark-500 bg-dark-200 rounded-full cursor-pointer"
+                            >
+                              <span>✎</span>
+                            </button>
+                            <button 
+                              onClick={(e) => deleteZikr(zikr.id, e)}
+                              className="w-8 h-8 flex items-center justify-center text-dark-500 bg-dark-200 rounded-full cursor-pointer"
+                            >
+                              <span>🗑️</span>
+                            </button>
+                          </div>
+                        </div>
+                        <div className="mt-2 flex justify-between text-sm">
+                          <span className="text-dark-500">العدد اليومي: {zikr.dailyCount}</span>
+                        </div>
+                        <div className="mt-1 flex justify-between text-sm">
+                          <span className="text-dark-500">العدد الكلي: {zikr.totalCount}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="fixed bottom-20 left-4 z-10">
+                    <button 
+                      onClick={addZikr}
+                      className="w-14 h-14 bg-primary rounded-full shadow-lg flex items-center justify-center text-white cursor-pointer"
+                    >
+                      <span className="text-2xl">+</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'stats' && (
+              <div className="px-4 py-6">
+                <div className="mt-4">
+                  <div className="text-center mb-6">
+                    <h2 className="text-lg font-medium text-white">{formatDate()}</h2>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div className="bg-dark-100 border border-dark-200 rounded-lg shadow-sm p-5">
+                      <div className="flex items-center">
+                        <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center ml-4">
+                          <span className="text-primary text-xl">📅</span>
+                        </div>
+                        <div>
+                          <h3 className="text-dark-500 text-sm">التسبيحات اليومية</h3>
+                          <p className="text-3xl font-bold text-white mt-1">{state.stats.daily}</p>
+                        </div>
+                        <div className="mr-auto">
+                          <button 
+                            onClick={(e) => editGoal('daily', e)}
+                            className="w-8 h-8 flex items-center justify-center text-dark-500 bg-dark-200 rounded-full"
+                          >
+                            <span>✎</span>
+                          </button>
+                        </div>
+                      </div>
+                      <div className="mt-4">
+                        <div className="flex justify-between text-sm mb-1">
+                          <span className="text-dark-500">الهدف اليومي</span>
+                          <span className="text-primary">
+                            {state.stats.daily} / {state.stats.goals.daily}
+                          </span>
+                        </div>
+                        <div className="w-full bg-dark-200 rounded-full h-2">
+                          <div 
+                            className="bg-primary h-2 rounded-full" 
+                            style={{ width: `${statsDaily}%` }}
+                          ></div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="bg-dark-100 border border-dark-200 rounded-lg shadow-sm p-5">
+                      <div className="flex items-center">
+                        <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center ml-4">
+                          <span className="text-primary text-xl">📅</span>
+                        </div>
+                        <div>
+                          <h3 className="text-dark-500 text-sm">التسبيحات الشهرية</h3>
+                          <p className="text-3xl font-bold text-white mt-1">{state.stats.monthly}</p>
+                        </div>
+                        <div className="mr-auto">
+                          <button 
+                            onClick={(e) => editGoal('monthly', e)}
+                            className="w-8 h-8 flex items-center justify-center text-dark-500 bg-dark-200 rounded-full"
+                          >
+                            <span>✎</span>
+                          </button>
+                        </div>
+                      </div>
+                      <div className="mt-4">
+                        <div className="flex justify-between text-sm mb-1">
+                          <span className="text-dark-500">الهدف الشهري</span>
+                          <span className="text-primary">
+                            {state.stats.monthly} / {state.stats.goals.monthly}
+                          </span>
+                        </div>
+                        <div className="w-full bg-dark-200 rounded-full h-2">
+                          <div 
+                            className="bg-primary h-2 rounded-full" 
+                            style={{ width: `${statsMonthly}%` }}
+                          ></div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="bg-dark-100 border border-dark-200 rounded-lg shadow-sm p-5">
+                      <div className="flex items-center">
+                        <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center ml-4">
+                          <span className="text-primary text-xl">🏆</span>
+                        </div>
+                        <div>
+                          <h3 className="text-dark-500 text-sm">المجموع الكلي</h3>
+                          <p className="text-3xl font-bold text-white mt-1">{state.stats.total}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'settings' && (
+              <div className="px-4 py-6">
+                <div className="mt-4 space-y-4">
+                  <div className="bg-dark-100 border border-dark-200 rounded-lg shadow-sm p-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center">
+                        <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center ml-3">
+                          <span className="text-primary">🔊</span>
+                        </div>
+                        <span className="text-white">الصوت</span>
+                      </div>
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input 
+                          type="checkbox" 
+                          className="sr-only peer"
+                          checked={state.settings.sound}
+                          onChange={(e) => updateSetting('sound', e.target.checked)}
+                        />
+                        <div className="w-11 h-6 bg-dark-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-dark-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                      </label>
+                    </div>
+                  </div>
+
+                  <div className="bg-dark-100 border border-dark-200 rounded-lg shadow-sm p-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center">
+                        <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center ml-3">
+                          <span className="text-primary">📳</span>
+                        </div>
+                        <span className="text-white">الاهتزاز</span>
+                      </div>
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input 
+                          type="checkbox" 
+                          className="sr-only peer"
+                          checked={state.settings.vibration}
+                          onChange={(e) => updateSetting('vibration', e.target.checked)}
+                        />
+                        <div className="w-11 h-6 bg-dark-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-dark-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                      </label>
+                    </div>
+                  </div>
+
+                  <div className="bg-dark-100 border border-dark-200 rounded-lg shadow-sm p-4">
+                    <div className="flex items-center">
+                      <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center ml-3">
+                        <span className="text-primary">ℹ️</span>
+                      </div>
+                      <button onClick={showAbout} className="text-white">عن التطبيق</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="fixed bottom-0 w-full bg-dark-100 border-t border-dark-200 shadow-sm z-10 max-w-md">
+            <div className="grid grid-cols-4 h-16">
+              <button 
+                onClick={() => setActiveTab('tasbih')}
+                className={`flex flex-col items-center justify-center cursor-pointer ${activeTab === 'tasbih' ? 'text-primary' : 'text-dark-500'}`}
+              >
+                <div className="w-6 h-6 flex items-center justify-center">
+                  <span className="text-xl">📿</span>
+                </div>
+                <span className="text-xs mt-1">التسبيح</span>
+              </button>
+              <button 
+                onClick={() => setActiveTab('azkar')}
+                className={`flex flex-col items-center justify-center cursor-pointer ${activeTab === 'azkar' ? 'text-primary' : 'text-dark-500'}`}
+              >
+                <div className="w-6 h-6 flex items-center justify-center">
+                  <span className="text-xl">📖</span>
+                </div>
+                <span className="text-xs mt-1">الأذكار</span>
+              </button>
+              <button 
+                onClick={() => setActiveTab('stats')}
+                className={`flex flex-col items-center justify-center cursor-pointer ${activeTab === 'stats' ? 'text-primary' : 'text-dark-500'}`}
+              >
+                <div className="w-6 h-6 flex items-center justify-center">
+                  <span className="text-xl">📊</span>
+                </div>
+                <span className="text-xs mt-1">الإحصائيات</span>
+              </button>
+              <button 
+                onClick={() => setActiveTab('settings')}
+                className={`flex flex-col items-center justify-center cursor-pointer ${activeTab === 'settings' ? 'text-primary' : 'text-dark-500'}`}
+              >
+                <div className="w-6 h-6 flex items-center justify-center">
+                  <span className="text-xl">⚙️</span>
+                </div>
+                <span className="text-xs mt-1">الإعدادات</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    try {
+      console.log('Main: Attempting to render React app');
+      const root = ReactDOM.createRoot(document.getElementById('root'));
+      root.render(<App />);
+      console.log('Main: React app rendered successfully');
+    } catch (error) {
+      console.error('Main: Error rendering React app:', error);
+    }
+  </script>
+  <script src="https://unpkg.com/@babel/standalone@7.22.5/babel.min.js" onerror='console.error("Failed to load Babel")'></script>
+</body>
+</html>
