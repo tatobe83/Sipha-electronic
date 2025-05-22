@@ -86,7 +86,7 @@
     }
     .progress-circle-bg {
       fill: none;
-      stroke-width: 8;
+      stroke-width: 14; /* Increased from 12 to 14 */
     }
     [data-theme="dark"] .progress-circle-bg {
       stroke: #ffffff;
@@ -97,7 +97,7 @@
     .progress-circle-fill {
       fill: none;
       stroke: #9333EA;
-      stroke-width: 8;
+      stroke-width: 14; /* Increased from 12 to 14 */
       stroke-linecap: round;
       transition: stroke-dashoffset .3s ease;
     }
@@ -312,7 +312,7 @@
         settings: {
           sound: true,
           vibration: true,
-          theme: 'dark' // Set dark theme as default
+          theme: 'dark' // Set dark theme as default at startup
         },
         stats: {
           daily: 0,
@@ -342,30 +342,38 @@
           const lastResetDate = localStorage.getItem('lastResetDate');
           const today = new Date().toISOString().split('T')[0];
 
+          let newState = { ...state }; // Start with initial state (theme: 'dark')
           if (savedState) {
             let parsedState = JSON.parse(savedState);
+            // Preserve all state except theme
+            newState = {
+              ...parsedState,
+              settings: {
+                ...parsedState.settings,
+                theme: 'dark' // Force dark theme at startup
+              }
+            };
             if (lastResetDate !== today) {
               console.log('App: New day detected, resetting daily counters');
-              parsedState = {
-                ...parsedState,
+              newState = {
+                ...newState,
                 dailyCount: 0,
-                azkar: parsedState.azkar.map(z => ({ ...z, dailyCount: 0 })),
+                azkar: newState.azkar.map(z => ({ ...z, dailyCount: 0 })),
                 stats: {
-                  ...parsedState.stats,
+                  ...newState.stats,
                   daily: 0
                 }
               };
               localStorage.setItem('lastResetDate', today);
-              localStorage.setItem('tasbihState', JSON.stringify(parsedState));
-              console.log('App: Daily counters reset and saved to localStorage');
             }
-            setState(parsedState);
-            console.log('App: State loaded from localStorage:', parsedState);
+            console.log('App: State loaded from localStorage with theme forced to dark:', newState);
           } else {
             localStorage.setItem('lastResetDate', today);
-            localStorage.setItem('tasbihState', JSON.stringify(state));
-            console.log('App: Initial state saved to localStorage:', state);
+            console.log('App: No saved state, using initial state with dark theme');
           }
+          setState(newState);
+          localStorage.setItem('tasbihState', JSON.stringify(newState));
+          console.log('App: State saved to localStorage:', newState);
         } catch (error) {
           console.error('App: Error parsing saved state or resetting counters:', error);
         }
